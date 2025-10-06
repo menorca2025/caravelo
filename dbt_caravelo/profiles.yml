@@ -1,0 +1,12 @@
+caravelo_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: caravelo_analytics
+      threads: 4
+      timeout_seconds: 300
+      location: EU
+      priority: interactive

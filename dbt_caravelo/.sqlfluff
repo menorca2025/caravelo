@@ -1,0 +1,26 @@
+# This file is used to configure sqlfluff.
+# It is a good practice to have this file in the root of your dbt project.
+
+[sqlfluff]
+dialect = bigquery
+templater = dbt
+runaway_limit = 10
+
+[sqlfluff:templater:dbt]
+project_dir = .
+
+[sqlfluff:rules]
+# Un-comment to relax the line length rule
+# max_line_length = 120
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.identifiers]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower
+
+[sqlfluff:rules:ambiguous.column_references]
+group_by_and_order_by_style = explicit

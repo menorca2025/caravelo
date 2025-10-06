@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: raw_data
+    description: "Raw data from the application"
+    database: "{{ env_var('GCP_PROJECT_ID') }}"
+    schema: caravelo_analytics
+    tables:
+      - name: providers
+        description: "Transportation providers"
+      - name: plans
+        description: "Subscription plans"
+      - name: users
+        description: "End users"
+      - name: subscriptions
+        description: "User subscriptions to plans"
