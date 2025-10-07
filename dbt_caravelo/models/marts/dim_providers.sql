@@ -6,5 +6,5 @@ WITH providers AS (
 SELECT
     provider_id AS dim_provider_pk,
     provider_name,
-    created_at
+    created_at_utc
 FROM providers

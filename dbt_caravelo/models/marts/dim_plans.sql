@@ -11,5 +11,5 @@ SELECT
     currency,
     billing_frequency,
     features,
-    created_at
+    created_at_utc
 FROM plans

@@ -2,82 +2,101 @@ version: 2
 
 models:
   - name: dim_providers
-    description: "Dimension table for providers"
+    description: "Dimension table for providers, containing one record per provider."
     columns:
       - name: dim_provider_pk
-        description: "Primary key for the providers dimension"
+        description: "Primary key for the providers dimension."
         tests:
           - unique
           - not_null
+      - name: provider_name
+        description: "Name of the provider."
+      - name: created_at_utc
+        description: "Timestamp in UTC when the provider was created."
 
   - name: dim_plans
-    description: "Dimension table for subscription plans"
+    description: "Dimension table for subscription plans, containing one record per plan."
     columns:
       - name: dim_plan_pk
-        description: "Primary key for the plans dimension"
+        description: "Primary key for the plans dimension."
         tests:
           - unique
           - not_null
       - name: price
-        description: "Price of the subscription plan"
+        description: "Price of the subscription plan in its original currency."
         tests:
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
               max_value: 2000
-              
+      - name: currency
+        description: "The currency of the plan's price."
+      - name: billing_frequency
+        description: "How often the plan bills (e.g., monthly, quarterly, annual)."
+      - name: created_at_utc
+        description: "Timestamp in UTC when the plan was created."
+
   - name: dim_users
-    description: "Dimension table for users"
+    description: "Dimension table for users, containing one record per user."
     columns:
       - name: dim_user_pk
-        description: "Primary key for the users dimension"
+        description: "Primary key for the users dimension."
         tests:
           - unique
           - not_null
       - name: email
-        description: "User's email address"
+        description: "User's email address. Used for joining but PII."
         tests:
           - dbt_expectations.expect_column_values_to_match_regex:
-              regex: r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+              regex: "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+              is_raw: true
+      - name: city
+        description: "The city where the user is located."
+      - name: country
+        description: "The country where the user is located."
+      - name: created_at_utc
+        description: "Timestamp in UTC when the user was created."
 
-  - name: fct_subscriptions
-    description: "Fact table for subscriptions"
+  - name: fct_subscription_events
+    description: "Fact table containing all subscription-related events. This is a transactional table showing each creation, renewal, failure, and cancellation."
     columns:
-      - name: subscription_id
-        description: "Primary key for the subscriptions fact table"
+      - name: event_id
+        description: "Primary key for each event."
         tests:
           - unique
           - not_null
       - name: dim_plan_fk
-        description: "Foreign key to the plans dimension"
+        description: "Foreign key to the plans dimension."
         tests:
           - relationships:
               to: ref('dim_plans')
               field: dim_plan_pk
       - name: dim_user_fk
-        description: "Foreign key to the users dimension"
+        description: "Foreign key to the users dimension."
         tests:
           - relationships:
               to: ref('dim_users')
               field: dim_user_pk
-      - name: dim_provider_fk
-        description: "Foreign key to the providers dimension"
-        tests:
-          - relationships:
-              to: ref('dim_providers')
-              field: dim_provider_pk
-
-  - name: mart_subscriptions_external
-    description: "External-facing data mart with PII-free data for external clients."
-    columns:
-      - name: subscription_id
-        description: "Primary key for the subscription"
+      - name: event_type
+        description: "The type of event (e.g., subscription_created, renewal_successful, renewal_failed)."
+      - name: event_timestamp_utc
+        description: "The UTC timestamp when the event occurred."
+      - name: amount_eur
+        description: "The transaction amount converted to EUR. Will be 0 for failed or non-monetary events."
         tests:
           - not_null
 
-  - name: mart_subscriptions_internal
-    description: "Internal-facing data mart with all available data for in-depth analysis."
+  - name: fct_revenue_recognition
+    description: "Fact table that allocates revenue from successful payments across the months of the service period. This provides an accrual-based view of revenue."
     columns:
-      - name: subscription_id
-        description: "Primary key for the subscription"
+      - name: revenue_month
+        description: "The month for which the revenue is recognized (first day of the month)."
         tests:
           - not_null
+      - name: subscription_id
+        description: "The subscription associated with the revenue."
+      - name: monthly_recognized_revenue_eur
+        description: "The portion of a subscription payment recognized as revenue for that specific month, in EUR."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0

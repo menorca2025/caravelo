@@ -26,4 +26,3 @@ models:
 seeds:
   caravelo_analytics:
     +quote_columns: false
-    +schema: caravelo_analytics
