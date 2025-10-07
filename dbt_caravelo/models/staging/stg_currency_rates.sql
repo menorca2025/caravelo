@@ -1,5 +1,5 @@
 WITH source AS (
-    SELECT * FROM {{ source('raw_data', 'currency_rates') }}
+    SELECT * FROM {{ ref('currency_rates') }}
 ),
 
 renamed AS (

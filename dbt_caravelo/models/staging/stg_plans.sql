@@ -1,6 +1,6 @@
 
 WITH source AS (
-    SELECT * FROM {{ source('raw_data', 'plans') }}
+    SELECT * FROM {{ ref('plans') }}
 ),
 
 renamed AS (
