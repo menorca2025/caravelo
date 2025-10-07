@@ -18,16 +18,17 @@ plans AS (
     FROM {{ ref('dim_plans') }}
 ),
 
--- Calculate the service period for each successful payment
-service_periods AS (
+-- Calculate the service period for each successful payment and report the revenue event.
+-- The revenue is recognized on the date of the event.
+final AS (
     SELECT
-        se.event_id,
+        CAST(se.event_timestamp_utc AS DATE) AS revenue_date,
         se.subscription_id,
         se.dim_plan_fk,
-        se.amount_eur,
+        se.amount_eur AS recognized_revenue_eur,
         p.billing_frequency,
+        -- Calculate the start and end of the service period for context
         CAST(se.event_timestamp_utc AS DATE) AS service_start_date,
-        -- Calculate the end of the service period based on the billing frequency
         CASE
             WHEN p.billing_frequency = 'monthly' THEN DATE_ADD(CAST(se.event_timestamp_utc AS DATE), INTERVAL 1 MONTH)
             WHEN p.billing_frequency = 'quarterly' THEN DATE_ADD(CAST(se.event_timestamp_utc AS DATE), INTERVAL 3 MONTH)
@@ -35,45 +36,15 @@ service_periods AS (
         END AS service_end_date
     FROM subscription_events se
     JOIN plans p ON se.dim_plan_fk = p.dim_plan_pk
-),
-
--- Generate a row for each month within the service period
--- Using a date spine to correctly allocate revenue across months
-date_spine AS (
-    SELECT
-        event_id,
-        DATE_TRUNC(day, MONTH) AS revenue_month
-    FROM service_periods,
-    UNNEST(GENERATE_DATE_ARRAY(service_start_date, CAST(service_end_date AS DATE) - INTERVAL 1 DAY, INTERVAL 1 DAY)) as day
-    GROUP BY 1, 2
-),
-
--- Calculate the number of months in each service period to correctly divide the revenue
-months_in_period AS (
-    SELECT
-        event_id,
-        COUNT(DISTINCT revenue_month) as num_months
-    FROM date_spine
-    GROUP BY 1
-),
-
--- Join back to get the final monthly recognized revenue
-final AS (
-    SELECT
-        ds.revenue_month,
-        sp.subscription_id,
-        sp.dim_plan_fk,
-        sp.amount_eur / mip.num_months AS recognized_revenue_eur
-    FROM date_spine ds
-    JOIN service_periods sp ON ds.event_id = sp.event_id
-    JOIN months_in_period mip ON ds.event_id = mip.event_id
 )
 
 SELECT
-    revenue_month,
+    revenue_date,
     subscription_id,
     dim_plan_fk,
-    SUM(recognized_revenue_eur) AS monthly_recognized_revenue_eur
+    billing_frequency,
+    service_start_date,
+    service_end_date,
+    recognized_revenue_eur AS monthly_recognized_revenue_eur -- Alias maintained for downstream compatibility
 FROM final
-GROUP BY 1, 2, 3
 ORDER BY 1, 2

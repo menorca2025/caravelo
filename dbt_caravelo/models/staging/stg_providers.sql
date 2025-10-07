@@ -1,6 +1,6 @@
 
 WITH source AS (
-    SELECT * FROM {{ source('raw_data', 'providers') }}
+    SELECT * FROM {{ ref('providers') }}
 ),
 
 renamed AS (

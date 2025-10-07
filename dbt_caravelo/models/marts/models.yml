@@ -88,7 +88,7 @@ models:
   - name: fct_revenue_recognition
     description: "Fact table that allocates revenue from successful payments across the months of the service period. This provides an accrual-based view of revenue."
     columns:
-      - name: revenue_month
+      - name: revenue_date
         description: "The month for which the revenue is recognized (first day of the month)."
         tests:
           - not_null
