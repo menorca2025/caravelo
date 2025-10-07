@@ -11,6 +11,8 @@ sources:
       - name: plans
         description: "Subscription plans"
       - name: users
-        description: "End users"
-      - name: subscriptions
-        description: "User subscriptions to plans"
+        description: "End users with geographic data"
+      - name: subscription_events
+        description: "Events related to user subscriptions (creation, renewal, cancellation)"
+      - name: currency_rates
+        description: "Daily currency conversion rates to EUR"

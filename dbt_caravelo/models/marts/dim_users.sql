@@ -8,6 +8,7 @@ SELECT
     full_name,
     email,
     phone_number,
-    address,
-    created_at
+    city,
+    country,
+    created_at_utc
 FROM users

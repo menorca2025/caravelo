@@ -12,7 +12,8 @@ renamed AS (
         currency,
         billing_frequency,
         features,
-        created_at
+        -- Cast the timestamp to UTC for standardization
+        CAST(created_at AS TIMESTAMP) AS created_at_utc
     FROM source
 )
 

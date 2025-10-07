@@ -2,8 +2,6 @@
 WITH plans AS (
     SELECT * FROM {{ ref('stg_plans') }}
 )
--- dummy comment to test git changes
--- IGNORE ---
 
 SELECT
     plan_id AS dim_plan_pk,
@@ -13,5 +11,5 @@ SELECT
     currency,
     billing_frequency,
     features,
-    created_at
+    created_at_utc
 FROM plans

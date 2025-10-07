@@ -9,8 +9,10 @@ renamed AS (
         full_name,
         email,
         phone_number,
-        address,
-        created_at
+        city,
+        country,
+        -- Cast the timestamp to UTC for standardization
+        CAST(created_at AS TIMESTAMP) AS created_at_utc
     FROM source
 )
 
