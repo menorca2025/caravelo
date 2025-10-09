@@ -1,6 +1,10 @@
 # Caravelo — Analytics Engineer Assignment
 
-Welcome — this repository contains the implementation for the Caravelo Analytics Engineer assignment.
+Hello, hello tech team of Caravelo!!! What a journey has been this case. Honestly super fun
+
+Let's get to it:
+
+In this repository contains the implementation for the Caravelo Analytics Engineer assignment.
 It demonstrates generating sample subscription data and calculating Monthly Recurring Revenue (MRR)
 and related KPIs using Python (for data generation) and dbt (for transformations, tests and documentation).
 
@@ -138,29 +142,3 @@ Design decisions:
 Optimisations and notes:
 - Models are written to be incremental-friendly where appropriate (see model materializations). For this small dataset, full-refresh runs are inexpensive.
 - Source and schema tests are included to catch data quality regressions early.
-
-## Submission guidelines (what to share)
-
-When you're ready to submit:
-
-- Share repository access with: `tech-assignment@caravelo.com` and `jlv@caravelo.com`.
-- Include any additional notes or a short write-up if you changed assumptions, or want to highlight specific design decisions. You can place these in this README under a new section or add a `WRITEUP.md` at the repo root.
-
-Suggested checklist for submission:
-- [ ] All code committed and pushed to a branch
-- [ ] README contains setup/run instructions (this file)
-- [ ] Brief write-up included (assumptions, optimisations)
-
-## Troubleshooting
-
-- If dbt complains about profiles: ensure `DBT_PROFILES_DIR` is pointing to `dbt_caravelo` or copy the `profiles.yml` file to `~/.dbt/profiles.yml`.
-- If a Python dependency fails: check your active Python version and recreate the virtualenv.
-- If `dbt seed` doesn't find CSVs: re-run `python seeds/data_generator.py` from the repository root so `dbt_caravelo/seeds/` contains the CSVs.
-
-## Contact / Questions
-
-If anything is unclear or you need additional help during evaluation, include notes in the repo or reach out to the assignment contacts listed above.
-
-----
-
-Thank you for reviewing — the project is intentionally small and straightforward to make it easy to run locally. If you'd like, I can also provide a short script that runs the full workflow (`generate -> seed -> run -> test -> docs`) in one step.
